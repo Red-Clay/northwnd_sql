@@ -4,187 +4,141 @@ Este repositorio contiene una versión modificada de la base de datos Northwind 
 
 ## 📋 Descripción del Proyecto
 
-![Imagen JSONB](./img/images.png)
-![Imagen github JSONB](./img/github_image.png)
-
 La base de datos Northwind ha sido extendida con las siguientes mejoras:
 
 ### ✨ Nuevas Funcionalidades
 
-- **Sistema de Categorías Jerárquicas**: Subcategorías para mejor organización
-- **Control de Stock Avanzado**: Alertas automáticas y stock mínimo
-- **Descuentos por Volumen**: Sistema automatizado de descuentos
-- **Auditoría Completa**: Registro de cambios en productos
-- **Vistas de Análisis**: Reportes de ventas y productos
-- **Triggers Inteligentes**: Automatización de procesos
+1. **Atributos dinámicos en productos (JSON)**: 
+   - Se añadió una columna JSON (`caracteristicas_json`) a la tabla `Products` para almacenar atributos dinámicos
+   - Ejemplo de datos almacenados: categoría, subcategoría, especificaciones (tamaño, material, ingredientes, etc.)
+   - Consultas SQL para extraer información del campo JSON
+
+2. **Descuentos por volumen**:
+   - Nueva tabla `volume_discounts` que define descuentos basados en cantidades mínimas compradas de un producto
+   - Vista `analisis_volumen_descuento` que muestra análisis detallados de los descuentos
+
+3. **Sistema de Categorías Jerárquicas**: Subcategorías para mejor organización de productos
 
 ## 🛠️ Tecnologías
 
 - **PostgreSQL** 12+ 
-- **pgAdmin** (opcional)
-- **SQL Dump** para instalación rápida
-
-## 📁 Estructura del Repositorio
-
-```
-northwind-postgres-modificado/
-├── README.md                          # Este archivo
-├── northwind_modificado.sql           # ⭐ DUMP COMPLETO DE LA BD
-├── docs/
-│   ├── INSTALACION.md                 # Guía de instalación
-│   ├── FUNCIONALIDADES.md             # Documentación de mejoras
-│   └── CONSULTAS_EJEMPLO.md           # Ejemplos de uso
-└── screenshots/
-    ├── diagrama_er.png                # Diagrama actualizado
-    └── consultas_ejemplo.png          # Capturas de pantalla
-```
+- **pgAdmin** (opcional, para gestión gráfica)
+- **Cliente psql** (para línea de comandos)
 
 ## 🚀 Instalación Rápida
 
 ### Prerrequisitos
-- PostgreSQL 12 o superior
-- Cliente psql o pgAdmin
+- PostgreSQL 12 o superior instalado
+- Acceso a la línea de comandos (para usar `psql`) o a pgAdmin
 
-### Instalación en 3 pasos
+### Pasos de instalación:
 
-1. **Clonar repositorio**
-```bash
-git clone https://github.com/tu-usuario/northwind-postgres-modificado.git
-cd northwind-postgres-modificado
-```
+1. **Clonar el repositorio**:
+   ```bash
+   git clone https://github.com/tu-usuario/northwind-postgres-modificado.git
+   cd northwind-postgres-modificado
+   ```
 
-2. **Crear base de datos**
-```bash
-createdb northwind_curso
-```
+2. **Crear la base de datos**:
+   ```bash
+   createdb northwind_curso
+   ```
 
-3. **Restaurar dump completo**
-```bash
-psql -d northwind_curso -f northwind_modificado.sql
-```
+3. **Restaurar el dump**:
+   ```bash
+   psql -d northwind_curso -f northwind_modificado.sql
+   ```
 
-¡Y listo! La base de datos estará completamente configurada con datos de ejemplo.
-
-### Alternativa con pgAdmin
-1. Crear nueva base de datos llamada `northwind_curso`
-2. Click derecho → Restore
-3. Seleccionar archivo `northwind_modificado.sql`
-4. Ejecutar
-
-## 🔍 Funcionalidades Principales
-
-### 1. Modificación de la tabla Products
-
-Objetivo: Añadir un campo JSON para almacenar atributos dinámicos de productos (ej: especificaciones técnicas, metadatos).
-
-1. Añadir la columna caracteristicas_json en la tabla Products.
-2. Rellenar la nueva columna con datos JSON
-Insertar ejemplos con valores específicos de "categoria" y "subcategoria".
-3. Ejecutar consultas sobre los datos JSON
-    Obtener productos de una categoría específica.
-    Filtrar productos según una subcategoría dentro del JSON.
-
-
-### 2. Control de Stock Inteligente
-```sql
--- Ver productos con stock bajo
-SELECT * FROM productos_stock_bajo;
-```
-
-
-### 3. Propuesta del alumno
-
-Incluye aquí tu propuesta
-................
-
-
-
-## 📊 Nuevas Tablas Añadidas 
-
-- `subcategories` - Categorías jerárquicas
-- `volume_discounts` - Descuentos por cantidad
-- `product_audit` - Auditoría de cambios
-- `stock_alerts` - Alertas de inventario
-
-## 📈 Vistas Creadas
-
-- `productos_stock_bajo` - Control de inventario
-- `ventas_mensuales` - Análisis temporal
-- `top_productos_vendidos` - Ranking de productos
-- `analisis_clientes` - Segmentación de clientes
-
-## 🔧 Funciones y Triggers
-
-- **Auditoría automática** en cambios de productos
-- **Alertas de stock** cuando baja del mínimo
-- **Cálculo de descuentos** por volumen de compra
-- **Actualización automática** de timestamps
-
-## 📝 Datos de Prueba
-
-El dump incluye:
-- Base Northwind completa original
-- 8 subcategorías de ejemplo
-- 8 reglas de descuento por volumen
-- Configuración de stock mínimo
-- Alertas de ejemplo generadas
-
-## 🧪 Validar Instalación
+## 🔍 Validar Instalación
 
 Después de restaurar, ejecuta estas consultas para verificar:
 
 ```sql
--- Verificar nuevas tablas
-SELECT count(*) FROM subcategories;        -- Debe mostrar 8
-SELECT count(*) FROM volume_discounts;     -- Debe mostrar 8
-SELECT count(*) FROM stock_alerts;        -- Debe mostrar varias
+-- Verificar la columna JSON en Products
+SELECT product_id, product_name, caracteristicas_json 
+FROM Products 
+WHERE caracteristicas_json IS NOT NULL;
 
--- Probar vistas
-SELECT count(*) FROM productos_stock_bajo;
-SELECT count(*) FROM ventas_mensuales;
+-- Verificar la tabla de descuentos por volumen
+SELECT * FROM volume_discounts;
 
--- Probar función
-SELECT calcular_descuento_volumen(1, 100);  -- Debe mostrar 10.00
+-- Probar la vista de análisis de descuentos
+SELECT * FROM analisis_volumen_descuento;
 ```
 
-## 📋 Especificaciones Técnicas
+## 📊 Nuevas Características Técnicas
 
-- **Versión PostgreSQL**: 12+
-- **Tamaño del dump**: ~500KB
-- **Total tablas**: 17 (13 originales + 4 nuevas)
-- **Total vistas**: 4
-- **Total funciones**: 3
-- **Triggers**: 1 principal con múltiples eventos
+### 1. Atributos dinámicos en productos (JSON)
 
-## 👨‍🎓 Información Académica
+**Modificación de la tabla Products**:
+```sql
+ALTER TABLE Products
+ADD COLUMN caracteristicas_json JSON;
+```
 
-- **Curso**: Bases de Datos Avanzadas
-- **Institución**: [Tu Institución]
-- **Autor**: [Tu Nombre]
-- **Fecha**: Mayo 2025
+**Ejemplo de actualización de datos JSON**:
+```sql
+UPDATE Products SET caracteristicas_json = '{
+  "categoria": "Bebidas",
+  "subcategoria": "Calientes",
+  "especificaciones": {
+    "tamano": "500 ml",
+    "material": "Vidrio",
+    "ingredientes": ["Té", "Especias"]
+  }
+}' WHERE product_id = 1;
+```
+
+**Consultas sobre datos JSON**:
+```sql
+SELECT 
+  caracteristicas_json->>'categoria' AS Categoria,
+  caracteristicas_json->>'subcategoria' AS Subcategoria,
+  caracteristicas_json->'especificaciones'->>'tamano' AS Tamaño
+FROM Products
+WHERE caracteristicas_json IS NOT NULL;
+```
+
+### 2. Descuentos por volumen
+
+**Creación de tabla**:
+```sql
+CREATE TABLE volume_discounts (
+  discount_id INT PRIMARY KEY,
+  product_id INT NOT NULL,
+  MinQuantity INT NOT NULL,
+  Discount DECIMAL(4,2) NOT NULL CHECK (Discount BETWEEN 0 AND 1),
+  FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+```
+
+**Vista de análisis**:
+```sql
+CREATE VIEW analisis_volumen_descuento AS
+SELECT
+  vd.discount_id,
+  vd.product_id,
+  p.product_name,
+  p.unit_price,
+  vd.MinQuantity,
+  vd.Discount AS DiscountRate,
+  ROUND((p.unit_price * (1 - vd.Discount))::NUMERIC, 2) AS DiscountedPrice,
+  ROUND((p.unit_price * vd.Discount)::NUMERIC, 2) AS SavingsPerUnit,
+  (vd.MinQuantity * p.unit_price) AS OriginalBatchPrice,
+  ROUND((vd.MinQuantity * p.unit_price * (1 - vd.Discount))::NUMERIC, 2) AS DiscountedBatchPrice,
+  ROUND((vd.MinQuantity * p.unit_price * vd.Discount)::NUMERIC, 2) AS TotalSavings
+FROM volume_discounts vd
+JOIN Products p ON vd.product_id = p.product_id;
+```
 
 ## 📞 Soporte
 
 Si tienes problemas con la instalación:
-
-1. Verifica que PostgreSQL esté corriendo
-2. Asegúrate de tener permisos para crear BD
-3. Revisa que el archivo SQL esté completo
-4. Consulta los logs de PostgreSQL para errores
-
-## 🎯 Objetivos de Aprendizaje Demostrados
-
-- ✅ Modificación de esquemas existentes
-- ✅ Creación de tablas relacionadas
-- ✅ Implementación de triggers
-- ✅ Desarrollo de vistas complejas
-- ✅ Funciones en PL/pgSQL
-- ✅ Optimización con índices
-- ✅ Sistemas de auditoría
-- ✅ Generación de dumps
+1. Verifica que PostgreSQL esté corriendo (`sudo service postgresql status`)
+2. Asegúrate de tener permisos para crear bases de datos
+3. Revisa que el archivo `northwind_modificado.sql` esté completo
+4. Consulta los logs de PostgreSQL para errores detallados
 
 ---
 
-**Nota**: Este proyecto demuestra conocimientos avanzados en PostgreSQL aplicados sobre la conocida base de datos Northwind, añadiendo funcionalidades empresariales reales.
-
-
+**Nota**: Esta versión modificada de Northwind demuestra implementaciones avanzadas de PostgreSQL como campos JSON, vistas complejas y estructuras de datos jerárquicas.
